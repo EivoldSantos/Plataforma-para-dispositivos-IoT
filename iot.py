@@ -1,11 +1,12 @@
 import pandas as pd
-import random #É válido ressltar que essa é uma biblioteca que já vem no pacote padrão do python
+import random #É válido ressaltar que essa é uma biblioteca que já vem no pacote padrão do python
 import time #É válido ressaltar que essa é uma biblioteca que já vem no pacote padrão do python
-from azure.iot.device import IoTHubDeviceClient, Message
+from azure.iot.device import IoTHubDeviceClient, Message 
 import duckdb
 
 #String de conexão do dispositivo
-connection_string = "HostName=PlataformaPreditiva.azure-devices.net;DeviceId=STM32;SharedAccessKey=9JQUXFqr1S1oeKc8XP3OlvEr+U9zXMCKJPmeIamlzDM="
+connection_string ="HostName=PlataformaPreditiva.azure-devices.net;DeviceId=STM32;SharedAccessKey=9JQUXFqr1S1oeKc8XP3OlvEr+U9zXMCKJPmeIamlzDM="
+                    
 
 #Inicializa o cliente do dispositivo
 client = IoTHubDeviceClient.create_from_connection_string(connection_string)
@@ -24,7 +25,7 @@ class BACKEND:
             #Criar uma mensagem JSON
         mensagemCorrente = Message(f'{{"Corrente detectada:" {correnteEletrica}}}')
 
-                #Enviar a mensagem para o IoT Hub
+            #Enviar a mensagem para o IoT Hub
         #client.send_message(mensagemCorrente)
         print(f"Mensagem enviada: {mensagemCorrente}")
 
@@ -131,15 +132,15 @@ class BACKEND:
             #con.close()
             #con = duckdb.connect('plataforma.duckdb')
             #with duckdb.connect('plataforma.duckdb') as con:
-        while True:
-            with duckdb.connect('plataforma.duckdb') as con:
-                BACKEND.predicaoCorrente(con)
-                BACKEND.enviar_telemetria(con)
-                BACKEND.precisadeManutencao(con)
-                BACKEND.limpaHistoricodeCorrente(con)
-                BACKEND.limpaHistoricoTemperatura(con)
-                con.close()
-                time.sleep(5)
+            #while True:
+        with duckdb.connect('plataforma.duckdb') as con:
+            BACKEND.predicaoCorrente(con)
+            BACKEND.enviar_telemetria(con)
+            BACKEND.precisadeManutencao(con)
+            BACKEND.limpaHistoricodeCorrente(con)
+            BACKEND.limpaHistoricoTemperatura(con)
+            con.close()
+            time.sleep(5)
             
         
         

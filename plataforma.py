@@ -4,6 +4,7 @@ import time
 import plotly.express as px
 import duckdb
 import pandas as pd
+from prophet import Prophet
 
 
 
@@ -43,8 +44,43 @@ horariodoTestedeTemperatura = [row[0] for row in horariodoTestedeTemperatura]
 umidadeTeste = [row[0] for row in umidadeTeste]
 
 #Condicionais para diferenciar os gráficos
+umidade_df = pd.DataFrame({
+    'ds': horariodoTestedeTemperatura,  # Timestamps
+    'y': umidadeTeste                  # Valores de umidade
+})
+
+temperatura_df = pd.DataFrame({
+    'ds': horariodoTestedeTemperatura,  # Timestamps
+    'y': temperaturaTeste              # Valores de temperatura
+})
+
+model_umidade = Prophet()
+model_umidade.fit(umidade_df)
+
+future_umidade = model_umidade.make_future_dataframe(periods=200, freq='S')
+forecast_umidade = model_umidade.predict(future_umidade)
+
+
+model_temperatura = Prophet()
+model_temperatura.fit(temperatura_df)
+
+future_temperatura = model_temperatura.make_future_dataframe(periods=200, freq='S')
+forecast_temperatura = model_temperatura.predict(future_temperatura)
 
 while True:
+    if 'Parâmetros de temperatura' in relatorios:
+        st.write("Previsão de temperatura futura")
+        st.write(forecast_temperatura[['ds', 'yhat']])
+        fig_temp = model_temperatura.plot(forecast_temperatura)
+        st.pyplot(fig_temp)
+
+    if 'Parâmetros de temperatura' in relatorios:
+        st.write("Previsão de umidade futura")
+        st.write(forecast_umidade[['ds', 'yhat']])
+        fig_umidade = model_umidade.plot(forecast_umidade)
+        st.pyplot(fig_umidade)
+        
+        
     if 'Parâmetros de corrente' in relatorios:
         st.subheader("Dados relacionados a corrente")
         fig_col1 = px.line(x=horariodoTestedeCorrente, y= correnteTeste, title="Hisórico dos parâmetros de corrente")
@@ -59,8 +95,7 @@ while True:
         
     if 'Manutenções preventivas' in relatorios:
         st.write(manutecaoPreventivaTeste)
+        
     BACKEND.funcaoMain()
-    
     time.sleep(5)
-    
-    st.experimental_rerun()
+    st.rerun()
